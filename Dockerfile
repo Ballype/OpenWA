@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
 
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV NODE_ENV=production
 
 WORKDIR /app
 
@@ -21,6 +20,8 @@ RUN npm run build
 RUN npm prune --omit=dev && npm cache clean --force
 
 RUN mkdir -p ./data/sessions ./data/media
+
+ENV NODE_ENV=production
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/main"]
