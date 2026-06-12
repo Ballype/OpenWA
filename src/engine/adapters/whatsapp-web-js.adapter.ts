@@ -380,6 +380,23 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
     });
   }
 
+  // ============= Interactive Messages =============
+
+  async sendListMessage(
+    chatId: string,
+    body: string,
+    buttonText: string,
+    sections: import('../interfaces/whatsapp-engine.interface').ListSection[],
+    title?: string,
+    footer?: string,
+  ): Promise<MessageResult> {
+    this.ensureReady();
+    const { List } = await import('whatsapp-web.js');
+    const list = new List(body, buttonText, sections, title || '', footer || '');
+    const msg = await this.client!.sendMessage(chatId, list);
+    return { id: msg.id._serialized, timestamp: msg.timestamp };
+  }
+
   // ============= Phase 3: Extended Messaging =============
 
   async sendLocationMessage(chatId: string, location: LocationInput): Promise<MessageResult> {

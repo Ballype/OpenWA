@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, MaxLength, IsUrl, ValidateIf } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MaxLength, IsUrl, ValidateIf, IsArray, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class SendTextMessageDto {
   @ApiProperty({
@@ -73,6 +74,69 @@ export class SendMediaMessageDto {
   @IsString()
   @MaxLength(1024)
   caption?: string;
+}
+
+export class ListRowDto {
+  @ApiProperty({ example: 'item_1' })
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @ApiProperty({ example: 'Jollof Rice' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiPropertyOptional({ example: '₦2,500' })
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
+
+export class ListSectionDto {
+  @ApiProperty({ example: 'Food Items' })
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @ApiProperty({ type: [ListRowDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ListRowDto)
+  rows: ListRowDto[];
+}
+
+export class SendListDto {
+  @ApiProperty({ description: 'WhatsApp chat ID', example: '628123456789@c.us' })
+  @IsString()
+  @IsNotEmpty()
+  chatId: string;
+
+  @ApiProperty({ description: 'Body text shown above the list button', example: 'How may I assist you today?' })
+  @IsString()
+  @IsNotEmpty()
+  body: string;
+
+  @ApiProperty({ description: 'Label on the list open button', example: 'Select' })
+  @IsString()
+  @IsNotEmpty()
+  buttonText: string;
+
+  @ApiProperty({ type: [ListSectionDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ListSectionDto)
+  sections: ListSectionDto[];
+
+  @ApiPropertyOptional({ example: 'Restaurant Menu' })
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @ApiPropertyOptional({ example: 'Tap Select to choose an option' })
+  @IsOptional()
+  @IsString()
+  footer?: string;
 }
 
 export class MessageResponseDto {

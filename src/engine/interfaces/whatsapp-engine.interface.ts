@@ -194,6 +194,17 @@ export interface PaginatedProducts {
   };
 }
 
+export interface ListRow {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+export interface ListSection {
+  title: string;
+  rows: ListRow[];
+}
+
 export interface EngineEventCallbacks {
   onQRCode?: (qr: string) => void;
   onReady?: (phone: string, pushName: string) => void;
@@ -222,6 +233,9 @@ export interface IWhatsAppEngine {
   sendVideoMessage(chatId: string, media: MediaInput): Promise<MessageResult>;
   sendAudioMessage(chatId: string, media: MediaInput): Promise<MessageResult>;
   sendDocumentMessage(chatId: string, media: MediaInput): Promise<MessageResult>;
+
+  // Interactive Messages
+  sendListMessage(chatId: string, body: string, buttonText: string, sections: ListSection[], title?: string, footer?: string): Promise<MessageResult>;
 
   // Messaging - Extended (Phase 3)
   sendLocationMessage(chatId: string, location: LocationInput): Promise<MessageResult>;

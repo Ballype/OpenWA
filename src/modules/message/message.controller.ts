@@ -2,7 +2,7 @@ import { Controller, Post, Get, Param, Body, Query, HttpCode, HttpStatus } from 
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { MessageService } from './message.service';
 import { BulkMessageService } from './bulk-message.service';
-import { SendTextMessageDto, SendMediaMessageDto, MessageResponseDto } from './dto';
+import { SendTextMessageDto, SendMediaMessageDto, SendListDto, MessageResponseDto } from './dto';
 import { SendBulkMessageDto, BulkMessageResponseDto } from './dto/bulk-message.dto';
 import { RequireRole } from '../auth/decorators/auth.decorators';
 import { ApiKeyRole } from '../auth/entities/api-key.entity';
@@ -54,6 +54,16 @@ export class MessageController {
   @ApiResponse({ status: 404, description: 'Session not found' })
   async sendText(@Param('sessionId') sessionId: string, @Body() dto: SendTextMessageDto): Promise<MessageResponseDto> {
     return this.messageService.sendText(sessionId, dto);
+  }
+
+  @Post('send-list')
+  @RequireRole(ApiKeyRole.OPERATOR)
+  @ApiOperation({ summary: 'Send a WhatsApp interactive list message (tappable menu)' })
+  @ApiParam({ name: 'sessionId', description: 'Session ID' })
+  @ApiResponse({ status: 201, description: 'List message sent', type: MessageResponseDto })
+  @ApiResponse({ status: 400, description: 'Session not active or invalid request' })
+  async sendList(@Param('sessionId') sessionId: string, @Body() dto: SendListDto): Promise<MessageResponseDto> {
+    return this.messageService.sendList(sessionId, dto);
   }
 
   @Post('send-image')

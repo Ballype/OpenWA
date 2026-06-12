@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SessionService } from '../session/session.service';
-import { SendTextMessageDto, SendMediaMessageDto, MessageResponseDto } from './dto';
+import { SendTextMessageDto, SendMediaMessageDto, SendListDto, MessageResponseDto } from './dto';
 import { MediaInput } from '../../engine/interfaces/whatsapp-engine.interface';
 import { Message, MessageDirection, MessageStatus } from './entities/message.entity';
 import { HookManager } from '../../core/hooks';
@@ -464,6 +464,27 @@ export class MessageService {
   ): Promise<void> {
     const engine = this.getEngine(sessionId);
     await engine.deleteMessage(dto.chatId, dto.messageId, dto.forEveryone ?? true);
+  }
+
+  async sendList(sessionId: string, dto: SendListDto): Promise<MessageResponseDto> {
+    const engine = this.getEngine(sessionId);
+    const message = await this.saveOutgoingMessage(sessionId, {
+      chatId: dto.chatId,
+      body: dto.body,
+      type: 'list',
+    });
+    try {
+      const result = await engine.sendListMessage(dto.chatId, dto.body, dto.buttonText, dto.sections, dto.title, dto.footer);
+      message.waMessageId = result.id;
+      message.status = MessageStatus.SENT;
+      message.timestamp = result.timestamp;
+      await this.messageRepository.save(message);
+      return { messageId: result.id, timestamp: result.timestamp };
+    } catch (error) {
+      message.status = MessageStatus.FAILED;
+      await this.messageRepository.save(message);
+      throw error;
+    }
   }
 
   private getEngine(sessionId: string) {
