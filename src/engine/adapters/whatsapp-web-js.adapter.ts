@@ -394,8 +394,23 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { List } = require('whatsapp-web.js');
+
+      // If chatId is @lid format, resolve to @c.us — interactive messages don't render on LID
+      let resolvedChatId = chatId;
+      if (chatId.endsWith('@lid')) {
+        try {
+          const contact = await this.client!.getContactById(chatId);
+          if (contact?.number) {
+            resolvedChatId = `${contact.number}@c.us`;
+            this.logger.log(`Resolved LID ${chatId} -> ${resolvedChatId}`);
+          }
+        } catch (e: any) {
+          this.logger.warn(`Could not resolve LID ${chatId}: ${e?.message}`);
+        }
+      }
+
       const list = new List(body, buttonText, sections, title || '', footer || '');
-      const msg = await this.client!.sendMessage(chatId, list);
+      const msg = await this.client!.sendMessage(resolvedChatId, list);
       return { id: msg.id._serialized, timestamp: msg.timestamp };
     } catch (err: any) {
       this.logger.error(`sendListMessage failed for ${chatId}: ${err?.message || err}`, err?.stack);
