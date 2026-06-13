@@ -2,7 +2,7 @@ import { Controller, Post, Get, Param, Body, Query, HttpCode, HttpStatus } from 
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { MessageService } from './message.service';
 import { BulkMessageService } from './bulk-message.service';
-import { SendTextMessageDto, SendMediaMessageDto, SendListDto, MessageResponseDto } from './dto';
+import { SendTextMessageDto, SendMediaMessageDto, SendListDto, SendPollDto, MessageResponseDto } from './dto';
 import { SendBulkMessageDto, BulkMessageResponseDto } from './dto/bulk-message.dto';
 import { RequireRole } from '../auth/decorators/auth.decorators';
 import { ApiKeyRole } from '../auth/entities/api-key.entity';
@@ -64,6 +64,16 @@ export class MessageController {
   @ApiResponse({ status: 400, description: 'Session not active or invalid request' })
   async sendList(@Param('sessionId') sessionId: string, @Body() dto: SendListDto): Promise<MessageResponseDto> {
     return this.messageService.sendList(sessionId, dto);
+  }
+
+  @Post('send-poll')
+  @RequireRole(ApiKeyRole.OPERATOR)
+  @ApiOperation({ summary: 'Send a WhatsApp poll (tappable interactive options that render on all accounts)' })
+  @ApiParam({ name: 'sessionId', description: 'Session ID' })
+  @ApiResponse({ status: 201, description: 'Poll sent', type: MessageResponseDto })
+  @ApiResponse({ status: 400, description: 'Session not active or invalid request' })
+  async sendPoll(@Param('sessionId') sessionId: string, @Body() dto: SendPollDto): Promise<MessageResponseDto> {
+    return this.messageService.sendPoll(sessionId, dto);
   }
 
   @Post('send-image')

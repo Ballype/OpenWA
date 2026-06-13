@@ -418,6 +418,25 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
     }
   }
 
+  async sendPollMessage(
+    chatId: string,
+    name: string,
+    options: string[],
+    allowMultipleAnswers?: boolean,
+  ): Promise<MessageResult> {
+    this.ensureReady();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { Poll } = require('whatsapp-web.js');
+      const poll = new Poll(name, options, { allowMultipleAnswers: allowMultipleAnswers ?? false });
+      const msg = await this.client!.sendMessage(chatId, poll);
+      return { id: msg.id._serialized, timestamp: msg.timestamp };
+    } catch (err: any) {
+      this.logger.error(`sendPollMessage failed for ${chatId}: ${err?.message || err}`, err?.stack);
+      throw new Error(`Poll message failed: ${err?.message || String(err)}`);
+    }
+  }
+
   // ============= Phase 3: Extended Messaging =============
 
   async sendLocationMessage(chatId: string, location: LocationInput): Promise<MessageResult> {

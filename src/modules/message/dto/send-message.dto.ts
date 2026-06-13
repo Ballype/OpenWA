@@ -139,6 +139,31 @@ export class SendListDto {
   footer?: string;
 }
 
+export class SendPollDto {
+  @ApiProperty({ description: 'WhatsApp chat ID', example: '628123456789@c.us' })
+  @IsString()
+  @IsNotEmpty()
+  chatId: string;
+
+  @ApiProperty({ description: 'Poll question / title', example: 'Choose your meal' })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @ApiProperty({
+    description: 'Poll options (2-12 tappable choices)',
+    example: ['Jollof Rice - ₦2,500', 'Fried Rice - ₦2,000', 'Suya Platter - ₦3,500'],
+    type: [String],
+  })
+  @IsArray()
+  @IsString({ each: true })
+  options: string[];
+
+  @ApiPropertyOptional({ description: 'Allow selecting more than one option', example: false })
+  @IsOptional()
+  allowMultipleAnswers?: boolean;
+}
+
 export class MessageResponseDto {
   @ApiProperty({ example: 'true_628123456789@c.us_3EB0123456789' })
   messageId: string;

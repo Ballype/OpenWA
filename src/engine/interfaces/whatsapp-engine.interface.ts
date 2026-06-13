@@ -236,6 +236,7 @@ export interface IWhatsAppEngine {
 
   // Interactive Messages
   sendListMessage(chatId: string, body: string, buttonText: string, sections: ListSection[], title?: string, footer?: string): Promise<MessageResult>;
+  sendPollMessage(chatId: string, name: string, options: string[], allowMultipleAnswers?: boolean): Promise<MessageResult>;
 
   // Messaging - Extended (Phase 3)
   sendLocationMessage(chatId: string, location: LocationInput): Promise<MessageResult>;
