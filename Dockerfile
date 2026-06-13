@@ -24,4 +24,4 @@ RUN mkdir -p ./data/sessions ./data/media
 ENV NODE_ENV=production
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "mkdir -p /app/data/sessions /app/data/media && node dist/main"]
