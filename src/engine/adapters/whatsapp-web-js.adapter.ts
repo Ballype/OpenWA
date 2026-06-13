@@ -391,10 +391,15 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
     footer?: string,
   ): Promise<MessageResult> {
     this.ensureReady();
-    const { List } = await import('whatsapp-web.js');
-    const list = new List(body, buttonText, sections, title || '', footer || '');
-    const msg = await this.client!.sendMessage(chatId, list);
-    return { id: msg.id._serialized, timestamp: msg.timestamp };
+    try {
+      const { List } = await import('whatsapp-web.js');
+      const list = new List(body, buttonText, sections, title || '', footer || '');
+      const msg = await this.client!.sendMessage(chatId, list);
+      return { id: msg.id._serialized, timestamp: msg.timestamp };
+    } catch (err: any) {
+      this.logger.error(`sendListMessage failed for ${chatId}: ${err?.message || err}`, err?.stack);
+      throw new Error(`List message failed: ${err?.message || String(err)}`);
+    }
   }
 
   // ============= Phase 3: Extended Messaging =============
