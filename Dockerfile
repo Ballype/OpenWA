@@ -24,4 +24,4 @@ RUN mkdir -p ./data/sessions ./data/media
 ENV NODE_ENV=production
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "mkdir -p /app/data/sessions /app/data/media && find /app/data/sessions -name SingletonLock -o -name SingletonSocket -o -name SingletonCookie 2>/dev/null | xargs rm -f; node dist/main"]
+CMD ["sh", "-c", "mkdir -p /app/data/sessions /app/data/media && find /app/data -name SingletonLock -delete 2>/dev/null; find /app/data -name SingletonSocket -delete 2>/dev/null; find /app/data -name SingletonCookie -delete 2>/dev/null; node dist/main"]
