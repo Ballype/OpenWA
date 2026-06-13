@@ -392,7 +392,8 @@ export class WhatsAppWebJsAdapter extends EventEmitter implements IWhatsAppEngin
   ): Promise<MessageResult> {
     this.ensureReady();
     try {
-      const { List } = await import('whatsapp-web.js');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { List } = require('whatsapp-web.js');
       const list = new List(body, buttonText, sections, title || '', footer || '');
       const msg = await this.client!.sendMessage(chatId, list);
       return { id: msg.id._serialized, timestamp: msg.timestamp };
